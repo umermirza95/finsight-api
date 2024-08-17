@@ -4,15 +4,28 @@ import FSCategory from "../interface/FSCategory";
 import {v4 as uuidv4} from "uuid";
 import {firestore} from "firebase-admin";
 import {DecodedIdToken} from "firebase-admin/auth";
+import {getAllCategories} from "../services/category-services";
+import {errorResponse, successResponse} from "../utils/helpers";
+import {logger} from "firebase-functions/v1";
 
 export async function createCategory(req: Request, res: Response) {
   try {
     const user: DecodedIdToken = req.body.user;
     const newCategory = matchedData(req) as FSCategory;
     newCategory.id = uuidv4();
-    await firestore().collection("users").doc(user.uid).collection("categories").add(newCategory)
-    res.status(200).send()
-  } catch (error) {
-    res.status(200).send("NOT OK")
+    await firestore().collection("users").doc(user.uid).collection("categories").doc(newCategory.id).create(newCategory);
+    res.status(200).send(successResponse(newCategory, "category"))
+  } catch (error: any) {
+    res.status(400).send(errorResponse(error))
+  }
+}
+
+export async function getCategories(req: Request, res: Response) {
+  try {
+    const categories = await getAllCategories(req.body.user.uid)
+    res.status(200).send(successResponse(categories, "categories"))
+  } catch (error: any) {
+    logger.error(error);
+    res.status(400).send(errorResponse(error))
   }
 }

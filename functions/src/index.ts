@@ -5,7 +5,7 @@ import {signIn} from "./controller/user-controller";
 import initFirebase from "./firebase";
 import {authValidator} from "./validators/auth-validator";
 import {createCategoryValidator} from "./validators/category-validator";
-import {createCategory} from "./controller/cateogry-controller";
+import {createCategory, getCategories} from "./controller/cateogry-controller";
 import validate from "./validators/validate";
 
 initFirebase();
@@ -21,5 +21,6 @@ app.use(express.json());
 
 app.post("/signIn", signIn);
 app.post("/category", [authValidator, validate(createCategoryValidator)], createCategory);
+app.get("/category", authValidator, getCategories)
 
 exports.api = onRequest(app);
