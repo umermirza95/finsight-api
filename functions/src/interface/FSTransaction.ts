@@ -18,6 +18,7 @@ export default interface FSTransaction {
   mode: FSTransactionMode;
   amount: number;
   categoryId: string;
+  subCategoryId?: string
   date: Date;
   updatedAt: Date;
 }

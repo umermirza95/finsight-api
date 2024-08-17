@@ -7,6 +7,8 @@ import {authValidator} from "./validators/auth-validator";
 import {createCategoryValidator} from "./validators/category-validator";
 import {createCategory, getCategories} from "./controller/cateogry-controller";
 import validate from "./validators/validate";
+import {createTransactionValidator} from "./validators/transaction-validator";
+import {createTransaction} from "./controller/transaction-controller";
 
 initFirebase();
 
@@ -20,7 +22,10 @@ app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 
 app.post("/signIn", signIn);
+
 app.post("/category", [authValidator, validate(createCategoryValidator)], createCategory);
 app.get("/category", authValidator, getCategories)
+
+app.post("/transaction", [authValidator, validate(createTransactionValidator)], createTransaction)
 
 exports.api = onRequest(app);
