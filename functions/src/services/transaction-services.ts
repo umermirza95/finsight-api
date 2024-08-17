@@ -1,11 +1,42 @@
 import {firestore} from "firebase-admin";
-import FSTransaction from "../interface/FSTransaction";
+import FSTransaction, {FSSupportedCurrencies} from "../interface/FSTransaction";
 import CONSTANTS from "../utils/constants";
+import ERROR_MESSAGES from "../utils/error-messages";
 
-export async function addNewTransaction(transaction: FSTransaction, userId:string) {
+
+export async function addNewTransaction(transaction: FSTransaction, userId: string) {
   await firestore().collection(CONSTANTS.COLLECTIONS.USERS)
     .doc(userId)
     .collection(CONSTANTS.COLLECTIONS.TRANSACTIONS)
     .doc(transaction.id)
     .create(transaction)
+}
+
+export function applyProcessingFee(transaction: FSTransaction): FSTransaction {
+  if (!transaction.processingFeePercent) {
+    return transaction;
+  }
+  const fee = parseFloat((transaction.baseAmount * (transaction.processingFeePercent / 100)).toFixed(2));
+  transaction.amount = transaction.baseAmount + fee;
+  return transaction;
+}
+
+export async function normalizeCurrency(transaction: FSTransaction): Promise<FSTransaction> {
+  if (!transaction.currency || transaction.currency === FSSupportedCurrencies.USD) {
+    return transaction;
+  }
+  const url=`${CONSTANTS.WISE_API_URL}/rates?source=PKR&target=USD&time=${transaction.date.toISOString()}`;
+  const req = await fetch(url, {
+    headers: {Authorization: "Bearer " + process.env.WISE_API_KEY},
+  });
+  const res = await req.text();
+  if (req.status >= 400) {
+    throw Error(res);
+  }
+  const exchangeRate = JSON.parse(res)[0]?.rate as number;
+  if (isNaN(exchangeRate)) {
+    throw Error(ERROR_MESSAGES["exchange_rate_failed"])
+  }
+  transaction.amount = parseFloat((transaction.baseAmount * exchangeRate).toFixed(2));
+  return transaction;
 }

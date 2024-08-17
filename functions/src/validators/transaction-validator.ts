@@ -1,5 +1,5 @@
 import {checkSchema} from "express-validator";
-import {FSTransactionMode, FSTransactionType} from "../interface/FSTransaction";
+import {FSSupportedCurrencies, FSTransactionMode, FSTransactionType} from "../interface/FSTransaction";
 import ERROR_MESSAGES from "../utils/error-messages";
 import {categoryIdValidator, subcategoryIdValidator} from "./category-validator";
 
@@ -50,5 +50,21 @@ export const createTransactionValidator = checkSchema({
       errorMessage: "Date is either missing or not valid",
     },
     toDate: true,
+  },
+  processingFeePercent: {
+    optional: true,
+    isNumeric: {
+      bail: true,
+      errorMessage: "processing fee is not a number",
+    },
+    toFloat: true,
+  },
+  currency: {
+    optional: true,
+    isIn: {
+      options: [[FSSupportedCurrencies.PKR, FSSupportedCurrencies.USD]],
+      errorMessage: "Transaction currency is not supported",
+    },
+    escape: true,
   },
 })
