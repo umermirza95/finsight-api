@@ -1,11 +1,12 @@
 import {checkSchema, Meta} from "express-validator";
 import ERROR_MESSAGES from "../utils/error-messages";
 import {FSCategoryType} from "../interface/FSCategory";
-import {getCategoryById, getCategoryByName, getSubCategoryById} from "../services/category-services";
+import {getCategoryById, getCategoryByName, getSubCategoryById, getSubCategoryByName} from "../services/category-services";
 
 export const createCategoryValidator = checkSchema({
   name: {
     exists: {
+      bail: true,
       errorMessage: ERROR_MESSAGES["category_name"],
     },
     isString: true,
@@ -23,11 +24,46 @@ export const createCategoryValidator = checkSchema({
   },
 })
 
+export const createSubCategoryValidator = checkSchema({
+  categoryId: {
+    exists: {
+      bail: true,
+      errorMessage: "Category Id is missing",
+    },
+    custom: {
+      bail: true,
+      options: categoryIdValidator,
+    },
+  },
+  name: {
+    exists: {
+      bail: true,
+      errorMessage: ERROR_MESSAGES["category_name"],
+    },
+    isString: true,
+    escape: true,
+    custom: {
+      options: uniqueSubCategoryNameValidator,
+    },
+  },
+})
+
 async function uniqueCategoryNameValidator(value: string, meta: Meta) {
   try {
     const category = await getCategoryByName(value, meta.req.body.user.uid)
     if (category) {
       throw Error("Category name is not unique")
+    }
+  } catch (error: any) {
+    throw Error(error)
+  }
+}
+
+async function uniqueSubCategoryNameValidator(value: string, meta: Meta) {
+  try {
+    const subcategory = await getSubCategoryByName(value, meta.req.body.user.uid)
+    if (subcategory) {
+      throw Error("Sub category name is not unique")
     }
   } catch (error: any) {
     throw Error(error)

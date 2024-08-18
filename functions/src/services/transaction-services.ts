@@ -2,9 +2,15 @@ import {firestore} from "firebase-admin";
 import FSTransaction, {FSSupportedCurrencies} from "../interface/FSTransaction";
 import CONSTANTS from "../utils/constants";
 import ERROR_MESSAGES from "../utils/error-messages";
+import {v4 as uuidv4} from "uuid";
 
 
 export async function addNewTransaction(transaction: FSTransaction, userId: string) {
+  transaction.id = uuidv4();
+  transaction.updatedAt = new Date();
+  transaction.baseAmount = transaction.amount;
+  transaction = applyProcessingFee(transaction);
+  transaction = await normalizeCurrency(transaction)
   await firestore().collection(CONSTANTS.COLLECTIONS.USERS)
     .doc(userId)
     .collection(CONSTANTS.COLLECTIONS.TRANSACTIONS)
@@ -25,7 +31,7 @@ export async function normalizeCurrency(transaction: FSTransaction): Promise<FST
   if (!transaction.currency || transaction.currency === FSSupportedCurrencies.USD) {
     return transaction;
   }
-  const url=`${CONSTANTS.WISE_API_URL}/rates?source=PKR&target=USD&time=${transaction.date.toISOString()}`;
+  const url = `${CONSTANTS.WISE_API_URL}/rates?source=PKR&target=USD&time=${transaction.date.toISOString()}`;
   const req = await fetch(url, {
     headers: {Authorization: "Bearer " + process.env.WISE_API_KEY},
   });

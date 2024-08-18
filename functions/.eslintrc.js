@@ -31,5 +31,7 @@ module.exports = {
     "require-jsdoc": 0,
     "semi": 0,
     "max-len": 0,
+    "no-mixed-spaces-and-tabs": 0,
+    "no-tabs": 0,
   },
 };
