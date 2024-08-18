@@ -23,7 +23,7 @@ export function applyProcessingFee(transaction: FSTransaction): FSTransaction {
     return transaction;
   }
   const fee = parseFloat((transaction.baseAmount * (transaction.processingFeePercent / 100)).toFixed(2));
-  transaction.amount = transaction.baseAmount + fee;
+  transaction.amount = parseFloat((transaction.baseAmount + fee).toFixed(2));
   return transaction;
 }
 
