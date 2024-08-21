@@ -18,6 +18,22 @@ export async function addNewTransaction(transaction: FSTransaction, userId: stri
     .create(transaction)
 }
 
+export async function getTransactionsInRange(userId: string, from: Date, to: Date): Promise<FSTransaction[]> {
+  const snapshop = await firestore()
+    .collection(CONSTANTS.COLLECTIONS.USERS)
+    .doc(userId)
+    .collection(CONSTANTS.COLLECTIONS.TRANSACTIONS)
+    .where("date", ">=", from)
+    .where("date", "<", to)
+    .get()
+
+  return snapshop.empty ? [] : snapshop.docs.map((d)=> {
+    const transaction = d.data() as FSTransaction;
+    transaction.date = new Date(d.data().date._seconds * 1000);
+    return transaction
+  });
+}
+
 export function applyProcessingFee(transaction: FSTransaction): FSTransaction {
   if (!transaction.processingFeePercent) {
     return transaction;

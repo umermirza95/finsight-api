@@ -3,6 +3,42 @@ import {FSSupportedCurrencies, FSTransactionMode, FSTransactionType} from "../in
 import ERROR_MESSAGES from "../utils/error-messages";
 import {categoryIdValidator, subcategoryIdValidator} from "./category-validator";
 
+
+export const getTransactionsValidator = checkSchema({
+  from: {
+    in: "query",
+    exists: {
+      bail: true,
+      errorMessage: "from date is required",
+    },
+    customSanitizer: {
+      options: (value) => {
+        const decodedValue = decodeURIComponent(value);
+        if (isNaN(Date.parse(decodedValue))) {
+          throw new Error("Invalid date format");
+        }
+        return new Date(decodedValue);
+      },
+    },
+  },
+  to: {
+    in: "query",
+    exists: {
+      bail: true,
+      errorMessage: "to date is required",
+    },
+    customSanitizer: {
+      options: (value) => {
+        const decodedValue = decodeURIComponent(value);
+        if (isNaN(Date.parse(decodedValue))) {
+          throw new Error("Invalid date format");
+        }
+        return new Date(decodedValue);
+      },
+    },
+  },
+})
+
 export const createTransactionValidator = checkSchema({
   type: {
     isIn: {

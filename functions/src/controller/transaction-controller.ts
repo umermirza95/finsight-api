@@ -4,7 +4,7 @@ import {errorResponse, successResponse} from "../utils/helpers";
 import {matchedData} from "express-validator";
 import FSTransaction, {FSTransactionType} from "../interface/FSTransaction";
 import {DecodedIdToken} from "firebase-admin/auth";
-import {addNewTransaction} from "../services/transaction-services";
+import {addNewTransaction, getTransactionsInRange} from "../services/transaction-services";
 import {readObjectsFromCsv} from "../services/csv-servicers";
 import {getAllCategories} from "../services/category-services";
 import FSSubCategory from "../interface/FSSubCategory";
@@ -17,6 +17,18 @@ export async function createTransaction(req: Request, res: Response) {
     const newTransaction = matchedData(req) as FSTransaction;
     await addNewTransaction(newTransaction, user.uid);
     res.status(200).send(successResponse(newTransaction, "transaction"))
+  } catch (error) {
+    logger.error(error);
+    res.status(400).send(errorResponse(error))
+  }
+}
+
+export async function getAllTransactions(req: Request, res: Response) {
+  try {
+    const user: DecodedIdToken = req.body.user;
+    const filters = matchedData(req);
+    const transactions = await getTransactionsInRange(user.uid, filters.from as Date, filters.to as Date);
+    res.status(200).send(successResponse(transactions, "transactions"))
   } catch (error) {
     logger.error(error);
     res.status(400).send(errorResponse(error))
@@ -41,7 +53,7 @@ export async function importFromCsv(req: Request, res: Response) {
       for (const validation of createTransactionValidator) {
         const result = await validation.run(req);
         if (!result.isEmpty()) {
-          return res.status(400).send("Invalid transaction found "+JSON.stringify(object))
+          return res.status(400).send("Invalid transaction found " + JSON.stringify(object))
         }
       }
       const newTransaction = matchedData(req) as FSTransaction;

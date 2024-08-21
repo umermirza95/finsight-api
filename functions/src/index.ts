@@ -7,8 +7,8 @@ import {authValidator} from "./validators/auth-validator";
 import {createCategoryValidator, createSubCategoryValidator} from "./validators/category-validator";
 import {createCategory, createSubCategory, getCategories} from "./controller/cateogry-controller";
 import validate from "./validators/validate";
-import {createTransactionValidator} from "./validators/transaction-validator";
-import {createTransaction, importFromCsv} from "./controller/transaction-controller";
+import {createTransactionValidator, getTransactionsValidator} from "./validators/transaction-validator";
+import {createTransaction, getAllTransactions} from "./controller/transaction-controller";
 
 initFirebase();
 
@@ -28,6 +28,7 @@ app.post("/subCategory", [authValidator, validate(createSubCategoryValidator)], 
 app.get("/category", authValidator, getCategories)
 
 app.post("/transaction", [authValidator, validate(createTransactionValidator)], createTransaction)
-app.post("/transaction/csv", [authValidator], importFromCsv)
+app.get("/transactions", [authValidator, validate(getTransactionsValidator)], getAllTransactions)
+app.post("/transaction/csv", [authValidator, validate(getTransactionsValidator)], getAllTransactions)
 
 exports.api = onRequest(app);
