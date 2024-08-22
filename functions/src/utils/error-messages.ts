@@ -8,6 +8,7 @@ const ERROR_MESSAGES: any = {
   "invalid_subcategory_id": "Sub category Id is not valid",
   "category_id_missing": "Category Id is required",
   "exchange_rate_failed": "Failed to acquire exchange rate",
+  "invalid_transaction_id": "Transaction Id is not valid",
 };
 
 export default ERROR_MESSAGES;

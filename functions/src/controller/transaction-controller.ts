@@ -4,7 +4,7 @@ import {errorResponse, successResponse} from "../utils/helpers";
 import {matchedData} from "express-validator";
 import FSTransaction, {FSTransactionType} from "../interface/FSTransaction";
 import {DecodedIdToken} from "firebase-admin/auth";
-import {addNewTransaction, getTransactionsInRange} from "../services/transaction-services";
+import {addNewTransaction, deleteTransactionById, getTransactionsInRange} from "../services/transaction-services";
 import {readObjectsFromCsv} from "../services/csv-servicers";
 import {getAllCategories} from "../services/category-services";
 import FSSubCategory from "../interface/FSSubCategory";
@@ -17,6 +17,18 @@ export async function createTransaction(req: Request, res: Response) {
     const newTransaction = matchedData(req) as FSTransaction;
     await addNewTransaction(newTransaction, user.uid);
     res.status(200).send(successResponse(newTransaction, "transaction"))
+  } catch (error) {
+    logger.error(error);
+    res.status(400).send(errorResponse(error))
+  }
+}
+
+export async function deleteTransaction(req: Request, res: Response) {
+  try {
+    const user: DecodedIdToken = req.body.user;
+    const urlParams = matchedData(req)
+    await deleteTransactionById(user.uid, urlParams.id);
+    res.status(200).send()
   } catch (error) {
     logger.error(error);
     res.status(400).send(errorResponse(error))

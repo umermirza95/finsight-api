@@ -18,6 +18,30 @@ export async function addNewTransaction(transaction: FSTransaction, userId: stri
     .create(transaction)
 }
 
+export async function deleteTransactionById(userId: string, id: string) {
+  await firestore()
+    .collection(CONSTANTS.COLLECTIONS.USERS)
+    .doc(userId)
+    .collection(CONSTANTS.COLLECTIONS.TRANSACTIONS)
+    .doc(id)
+    .delete();
+}
+
+export async function getTransactionById(userId: string, id: string): Promise<FSTransaction | null> {
+  const snapshop = await firestore()
+    .collection(CONSTANTS.COLLECTIONS.USERS)
+    .doc(userId)
+    .collection(CONSTANTS.COLLECTIONS.TRANSACTIONS)
+    .where("id", "==", id)
+    .get()
+  if (snapshop.empty) {
+    return null
+  }
+  const transaction = snapshop.docs[0].data() as FSTransaction;
+  transaction.date = new Date(snapshop.docs[0].data().date._seconds * 1000);
+  return transaction;
+}
+
 export async function getTransactionsInRange(userId: string, from: Date, to: Date): Promise<FSTransaction[]> {
   const snapshop = await firestore()
     .collection(CONSTANTS.COLLECTIONS.USERS)
@@ -25,9 +49,10 @@ export async function getTransactionsInRange(userId: string, from: Date, to: Dat
     .collection(CONSTANTS.COLLECTIONS.TRANSACTIONS)
     .where("date", ">=", from)
     .where("date", "<", to)
+    .orderBy("date", "desc")
     .get()
 
-  return snapshop.empty ? [] : snapshop.docs.map((d)=> {
+  return snapshop.empty ? [] : snapshop.docs.map((d) => {
     const transaction = d.data() as FSTransaction;
     transaction.date = new Date(d.data().date._seconds * 1000);
     return transaction

@@ -7,8 +7,8 @@ import {authValidator} from "./validators/auth-validator";
 import {createCategoryValidator, createSubCategoryValidator} from "./validators/category-validator";
 import {createCategory, createSubCategory, getCategories} from "./controller/cateogry-controller";
 import validate from "./validators/validate";
-import {createTransactionValidator, getTransactionsValidator} from "./validators/transaction-validator";
-import {createTransaction, getAllTransactions} from "./controller/transaction-controller";
+import {createTransactionValidator, deleteTransactionValidator, getTransactionsValidator} from "./validators/transaction-validator";
+import {createTransaction, deleteTransaction, getAllTransactions} from "./controller/transaction-controller";
 
 initFirebase();
 
@@ -30,5 +30,5 @@ app.get("/category", authValidator, getCategories)
 app.post("/transaction", [authValidator, validate(createTransactionValidator)], createTransaction)
 app.get("/transactions", [authValidator, validate(getTransactionsValidator)], getAllTransactions)
 app.post("/transaction/csv", [authValidator, validate(getTransactionsValidator)], getAllTransactions)
-
+app.delete("/transaction:id", [authValidator, validate(deleteTransactionValidator), deleteTransaction])
 exports.api = onRequest(app);

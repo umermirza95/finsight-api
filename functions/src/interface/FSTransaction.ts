@@ -25,6 +25,7 @@ export default interface FSTransaction {
   categoryId: string;
   subCategoryId?: string
   currency?: string,
+  comment?:string,
   date: Date;
   updatedAt: Date;
   type: FSTransactionType;
