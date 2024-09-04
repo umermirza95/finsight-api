@@ -1,15 +1,15 @@
-import {Request, Response} from "express";
-import {logger} from "firebase-functions/v1";
-import {errorResponse, successResponse} from "../utils/helpers";
-import {matchedData} from "express-validator";
-import FSTransaction, {FSTransactionType} from "../interface/FSTransaction";
-import {DecodedIdToken} from "firebase-admin/auth";
-import {addNewTransaction, deleteTransactionById, getTransactionsInRange} from "../services/transaction-services";
-import {readObjectsFromCsv} from "../services/csv-servicers";
-import {getAllCategories} from "../services/category-services";
+import { Request, Response } from "express";
+import { logger } from "firebase-functions/v1";
+import { errorResponse, successResponse } from "../utils/helpers";
+import { matchedData } from "express-validator";
+import FSTransaction, { FSTransactionType } from "../interface/FSTransaction";
+import { DecodedIdToken } from "firebase-admin/auth";
+import { addNewTransaction, deleteTransactionById, getTransactionsInRange } from "../services/transaction-services";
+import { readObjectsFromCsv } from "../services/csv-servicers";
+import { getAllCategories } from "../services/category-services";
 import FSSubCategory from "../interface/FSSubCategory";
 import FSCategory from "../interface/FSCategory";
-import {createTransactionValidator} from "../validators/transaction-validator";
+import { createTransactionValidator } from "../validators/transaction-validator";
 
 export async function createTransaction(req: Request, res: Response) {
   try {
@@ -49,27 +49,38 @@ export async function getAllTransactions(req: Request, res: Response) {
 
 export async function importFromCsv(req: Request, res: Response) {
   try {
-    let objects = await readObjectsFromCsv("january.csv");
+    const user: DecodedIdToken = req.body.user;
+    let objects = await readObjectsFromCsv("february.csv");
     objects = objects.filter((object) => object.type.toLowerCase() === "expense")
     const categories = await getAllCategories(req.body.user.uid)
     const newTransactions: FSTransaction[] = [];
     for (const object of objects) {
-      const amount = object.amount.includes("-") ? parseInt(object.amount) * -1 : parseInt(object.amount)
+      const amount = parseInt(object.amount.replace("-", ""))
       const category: FSCategory | undefined = categories.find((c) => c.name === object.category.toLowerCase());
       const subCategory: FSSubCategory | undefined = category?.subCategories?.find((sc) => sc.name === object.subCategory)
       req.body.type = FSTransactionType.expense
       req.body.amount = amount
       req.body.categoryId = category?.id
       req.body.date = object.date
+      req.body.currency = "PKR"
       req.body.subCategoryId = subCategory?.id
       for (const validation of createTransactionValidator) {
         const result = await validation.run(req);
         if (!result.isEmpty()) {
-          return res.status(400).send("Invalid transaction found " + JSON.stringify(object))
+          return res.status(400).send(JSON.stringify(result) +" " + JSON.stringify(object))
         }
       }
-      const newTransaction = matchedData(req) as FSTransaction;
-      newTransactions.push(newTransaction)
+      const newTransaction = matchedData(req, { includeOptionals: true })
+      for (const key in newTransaction) {
+        if (!newTransaction[key]) {
+          delete newTransaction[key]
+        }
+      }
+      logger.info(newTransaction)
+      newTransactions.push(newTransaction as FSTransaction)
+    }
+    for (const transaction of newTransactions) {
+      await addNewTransaction(transaction, user.uid);
     }
     logger.info(newTransactions.length + " new transactions found")
     return res.status(200).send("ok")

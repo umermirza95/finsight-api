@@ -1,6 +1,5 @@
 import cors from "cors";
 import express from "express";
-import {onRequest} from "firebase-functions/v1/https";
 import {signIn} from "./controller/user-controller";
 import initFirebase from "./firebase";
 import {authValidator} from "./validators/auth-validator";
@@ -8,7 +7,8 @@ import {createCategoryValidator, createSubCategoryValidator} from "./validators/
 import {createCategory, createSubCategory, getCategories} from "./controller/cateogry-controller";
 import validate from "./validators/validate";
 import {createTransactionValidator, deleteTransactionValidator, getTransactionsValidator} from "./validators/transaction-validator";
-import {createTransaction, deleteTransaction, getAllTransactions} from "./controller/transaction-controller";
+import {createTransaction, deleteTransaction, getAllTransactions, importFromCsv} from "./controller/transaction-controller";
+import { runWith } from "firebase-functions/v1";
 
 initFirebase();
 
@@ -29,6 +29,6 @@ app.get("/category", authValidator, getCategories)
 
 app.post("/transaction", [authValidator, validate(createTransactionValidator)], createTransaction)
 app.get("/transactions", [authValidator, validate(getTransactionsValidator)], getAllTransactions)
-app.post("/transaction/csv", [authValidator, validate(getTransactionsValidator)], getAllTransactions)
-app.delete("/transaction:id", [authValidator, validate(deleteTransactionValidator), deleteTransaction])
-exports.api = onRequest(app);
+app.post("/transaction/csv", authValidator, importFromCsv)
+app.delete("/transaction/:id", [authValidator, validate(deleteTransactionValidator), deleteTransaction])
+exports.api = runWith({timeoutSeconds: 120}).https.onRequest(app);
