@@ -8,7 +8,7 @@ import {createCategory, createSubCategory, getCategories} from "./controller/cat
 import validate from "./validators/validate";
 import {createTransactionValidator, deleteTransactionValidator, getTransactionsValidator} from "./validators/transaction-validator";
 import {createTransaction, deleteTransaction, getAllTransactions, importFromCsv} from "./controller/transaction-controller";
-import { runWith } from "firebase-functions/v1";
+import {runWith} from "firebase-functions/v1";
 
 initFirebase();
 

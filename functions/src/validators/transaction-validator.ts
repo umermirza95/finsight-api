@@ -60,12 +60,12 @@ export const createTransactionValidator = checkSchema({
       errorMessage: ERROR_MESSAGES["invalid_transaction_type"],
     },
   },
-  subType:{
+  subType: {
     optional: true,
-    isIn:{
+    isIn: {
       options: [[FSTransactionSubType.active, FSTransactionSubType.passive]],
-      errorMessage:"Invalid transaction sub type"
-    }
+      errorMessage: "Invalid transaction sub type",
+    },
   },
   mode: {
     optional: true,

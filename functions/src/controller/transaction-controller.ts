@@ -1,15 +1,15 @@
-import { Request, Response } from "express";
-import { logger } from "firebase-functions/v1";
-import { errorResponse, successResponse } from "../utils/helpers";
-import { matchedData } from "express-validator";
-import FSTransaction, { FSTransactionType } from "../interface/FSTransaction";
-import { DecodedIdToken } from "firebase-admin/auth";
-import { addNewTransaction, deleteTransactionById, getTransactionsInRange } from "../services/transaction-services";
-import { readObjectsFromCsv } from "../services/csv-servicers";
-import { getAllCategories } from "../services/category-services";
+import {Request, Response} from "express";
+import {logger} from "firebase-functions/v1";
+import {errorResponse, successResponse} from "../utils/helpers";
+import {matchedData} from "express-validator";
+import FSTransaction, {FSTransactionType} from "../interface/FSTransaction";
+import {DecodedIdToken} from "firebase-admin/auth";
+import {addNewTransaction, deleteTransactionById, getTransactionsInRange} from "../services/transaction-services";
+import {readObjectsFromCsv} from "../services/csv-servicers";
+import {getAllCategories} from "../services/category-services";
 import FSSubCategory from "../interface/FSSubCategory";
 import FSCategory from "../interface/FSCategory";
-import { createTransactionValidator } from "../validators/transaction-validator";
+import {createTransactionValidator} from "../validators/transaction-validator";
 
 export async function createTransaction(req: Request, res: Response) {
   try {
@@ -70,7 +70,7 @@ export async function importFromCsv(req: Request, res: Response) {
           return res.status(400).send(JSON.stringify(result) +" " + JSON.stringify(object))
         }
       }
-      const newTransaction = matchedData(req, { includeOptionals: true })
+      const newTransaction = matchedData(req, {includeOptionals: true})
       for (const key in newTransaction) {
         if (!newTransaction[key]) {
           delete newTransaction[key]
