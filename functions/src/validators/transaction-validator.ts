@@ -1,5 +1,5 @@
 import {checkSchema, Meta} from "express-validator";
-import {FSSupportedCurrencies, FSTransactionMode, FSTransactionType} from "../interface/FSTransaction";
+import {FSSupportedCurrencies, FSTransactionMode, FSTransactionSubType, FSTransactionType} from "../interface/FSTransaction";
 import ERROR_MESSAGES from "../utils/error-messages";
 import {categoryIdValidator, subcategoryIdValidator} from "./category-validator";
 import {getTransactionById} from "../services/transaction-services";
@@ -59,6 +59,13 @@ export const createTransactionValidator = checkSchema({
       options: [[FSTransactionType.expense, FSTransactionType.income]],
       errorMessage: ERROR_MESSAGES["invalid_transaction_type"],
     },
+  },
+  subType:{
+    optional: true,
+    isIn:{
+      options: [[FSTransactionSubType.active, FSTransactionSubType.passive]],
+      errorMessage:"Invalid transaction sub type"
+    }
   },
   mode: {
     optional: true,

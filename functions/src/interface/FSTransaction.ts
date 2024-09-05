@@ -4,6 +4,11 @@ export enum FSTransactionType {
   expense = "expense"
 }
 
+export enum FSTransactionSubType {
+  passive = "passive",
+  active = "active"
+}
+
 export enum FSTransactionMode {
   card = "card",
   cash = "cash",
@@ -25,9 +30,10 @@ export default interface FSTransaction {
   categoryId: string;
   subCategoryId?: string
   currency?: string,
-  comment?:string,
+  comment?: string,
   date: Date;
   updatedAt: Date;
   type: FSTransactionType;
+  subType?: FSTransactionSubType
   mode: FSTransactionMode;
 }

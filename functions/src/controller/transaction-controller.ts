@@ -50,7 +50,7 @@ export async function getAllTransactions(req: Request, res: Response) {
 export async function importFromCsv(req: Request, res: Response) {
   try {
     const user: DecodedIdToken = req.body.user;
-    let objects = await readObjectsFromCsv("february.csv");
+    let objects = await readObjectsFromCsv("transactions.csv");
     objects = objects.filter((object) => object.type.toLowerCase() === "expense")
     const categories = await getAllCategories(req.body.user.uid)
     const newTransactions: FSTransaction[] = [];

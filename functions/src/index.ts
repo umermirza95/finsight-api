@@ -31,4 +31,4 @@ app.post("/transaction", [authValidator, validate(createTransactionValidator)], 
 app.get("/transactions", [authValidator, validate(getTransactionsValidator)], getAllTransactions)
 app.post("/transaction/csv", authValidator, importFromCsv)
 app.delete("/transaction/:id", [authValidator, validate(deleteTransactionValidator), deleteTransaction])
-exports.api = runWith({timeoutSeconds: 120}).https.onRequest(app);
+exports.api = runWith({timeoutSeconds: 60}).https.onRequest(app);
