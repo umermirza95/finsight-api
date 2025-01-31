@@ -67,7 +67,7 @@ export async function importFromCsv(req: Request, res: Response) {
       for (const validation of createTransactionValidator) {
         const result = await validation.run(req);
         if (!result.isEmpty()) {
-          return res.status(400).send(JSON.stringify(result) +" " + JSON.stringify(object))
+          return res.status(400).send(JSON.stringify(result) + " " + JSON.stringify(object))
         }
       }
       const newTransaction = matchedData(req, {includeOptionals: true})

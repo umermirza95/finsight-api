@@ -1,7 +1,7 @@
 import {checkSchema, Meta} from "express-validator";
-import {FSSupportedCurrencies, FSTransactionMode, FSTransactionSubType, FSTransactionType} from "../interface/FSTransaction";
+import {FSTransactionMode, FSTransactionSubType, FSTransactionType, supportedCurrencies} from "../interface/FSTransaction";
 import ERROR_MESSAGES from "../utils/error-messages";
-import {categoryIdValidator, subcategoryIdValidator} from "./category-validator";
+import {categoryIdValidatorWithType, subcategoryIdValidator} from "./category-validator";
 import {getTransactionById} from "../services/transaction-services";
 
 
@@ -92,7 +92,7 @@ export const createTransactionValidator = checkSchema({
       errorMessage: ERROR_MESSAGES["category_id_missing"],
     },
     custom: {
-      options: categoryIdValidator,
+      options: categoryIdValidatorWithType,
     },
   },
   subCategoryId: {
@@ -119,7 +119,7 @@ export const createTransactionValidator = checkSchema({
   currency: {
     optional: true,
     isIn: {
-      options: [[FSSupportedCurrencies.PKR, FSSupportedCurrencies.USD]],
+      options: [supportedCurrencies],
       errorMessage: "Transaction currency is not supported",
     },
     escape: true,

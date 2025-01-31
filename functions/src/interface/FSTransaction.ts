@@ -18,8 +18,17 @@ export enum FSTransactionMode {
 
 export enum FSSupportedCurrencies {
   PKR = "PKR",
-  USD = "USD"
+  USD = "USD",
+  AED = "AED",
+  EUR = "EUR"
 }
+
+export const supportedCurrencies = [
+  FSSupportedCurrencies.PKR,
+  FSSupportedCurrencies.AED,
+  FSSupportedCurrencies.EUR,
+  FSSupportedCurrencies.USD,
+]
 
 
 export default interface FSTransaction {

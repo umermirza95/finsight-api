@@ -81,6 +81,17 @@ export async function categoryIdValidator(value: string, meta: Meta) {
   }
 }
 
+export async function categoryIdValidatorWithType(value: string, meta: Meta) {
+  try {
+    const category = await getCategoryById(value, meta.req.body.user.uid)
+    if (!category || category.type !== meta.req.body.type) {
+      throw Error(ERROR_MESSAGES["invalid_category"])
+    }
+  } catch (error: any) {
+    throw Error(error)
+  }
+}
+
 export async function subcategoryIdValidator(value: string, meta: Meta) {
   try {
     const subcategory = await getSubCategoryById(value, meta.req.body.user.uid)
