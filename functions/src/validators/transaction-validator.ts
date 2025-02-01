@@ -110,11 +110,7 @@ export const createTransactionValidator = checkSchema({
   },
   processingFeePercent: {
     optional: true,
-    isNumeric: {
-      bail: true,
-      errorMessage: "processing fee is not a number",
-    },
-    toFloat: true,
+    toBoolean: true,
   },
   currency: {
     optional: true,

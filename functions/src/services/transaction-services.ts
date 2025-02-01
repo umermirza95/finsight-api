@@ -1,14 +1,13 @@
 import {firestore} from "firebase-admin";
 import FSTransaction, {FSSupportedCurrencies} from "../interface/FSTransaction";
 import CONSTANTS from "../utils/constants";
-import {v4 as uuidv4} from "uuid";
 import getCurrencyConverter from "./currency-converter-service";
+import ICreateTransactionCommand from "../commands/createTransactionCommand";
+import {createTransactionFromCommand} from "../utils/helpers";
 
 
-export async function addNewTransaction(transaction: FSTransaction, userId: string, liveExchangeRate = false) {
-  transaction.id = uuidv4();
-  transaction.updatedAt = new Date();
-  transaction.baseAmount = transaction.amount;
+export async function addNewTransaction(command: ICreateTransactionCommand, userId: string, liveExchangeRate = false) : Promise<FSTransaction> {
+  let transaction: FSTransaction = createTransactionFromCommand(command);
   transaction = applyProcessingFee(transaction);
   transaction = await normalizeCurrency(transaction, liveExchangeRate)
   await firestore().collection(CONSTANTS.COLLECTIONS.USERS)
@@ -16,6 +15,7 @@ export async function addNewTransaction(transaction: FSTransaction, userId: stri
     .collection(CONSTANTS.COLLECTIONS.TRANSACTIONS)
     .doc(transaction.id)
     .create(transaction)
+  return transaction;
 }
 
 export async function deleteTransactionById(userId: string, id: string) {
