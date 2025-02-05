@@ -20,7 +20,7 @@ class CurrencyConverter implements FSICurrencyConverter {
 
 class CurrencyConverterWise implements FSICurrencyConverter {
   async convert(amount: number, convertFrom: string, date: Date) {
-    const url = `${CONSTANTS.WISE_API_URL}/rates?source=PKR&target=USD&time=${date.toISOString()}`;
+    const url = `${CONSTANTS.WISE_API_URL}/rates?source=${convertFrom}&target=USD&time=${date.toISOString()}`;
     const req = await fetch(url, {
       headers: {Authorization: "Bearer " + process.env.WISE_API_KEY},
     });

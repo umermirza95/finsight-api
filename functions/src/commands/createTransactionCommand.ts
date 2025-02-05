@@ -11,4 +11,5 @@ export default interface ICreateTransactionCommand {
     type: FSTransactionType;
     subType?: FSTransactionSubType;
     mode: FSTransactionMode;
+    useLiveFx?: boolean
 }

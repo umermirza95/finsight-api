@@ -124,6 +124,10 @@ export const createTransactionValidator = checkSchema({
     optional: true,
     escape: true,
   },
+  useLiveFx: {
+    optional: true,
+    toBoolean: true,
+  },
 })
 
 export async function transactionIdValidator(value: string, meta: Meta) {

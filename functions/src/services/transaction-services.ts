@@ -6,10 +6,10 @@ import ICreateTransactionCommand from "../commands/createTransactionCommand";
 import {createTransactionFromCommand} from "../utils/helpers";
 
 
-export async function addNewTransaction(command: ICreateTransactionCommand, userId: string, liveExchangeRate = false) : Promise<FSTransaction> {
+export async function addNewTransaction(command: ICreateTransactionCommand, userId: string) : Promise<FSTransaction> {
   let transaction: FSTransaction = createTransactionFromCommand(command);
   transaction = applyProcessingFee(transaction);
-  transaction = await normalizeCurrency(transaction, liveExchangeRate)
+  transaction = await normalizeCurrency(transaction, command.useLiveFx ?? false)
   await firestore().collection(CONSTANTS.COLLECTIONS.USERS)
     .doc(userId)
     .collection(CONSTANTS.COLLECTIONS.TRANSACTIONS)
