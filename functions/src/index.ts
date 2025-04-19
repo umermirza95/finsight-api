@@ -1,6 +1,5 @@
 import cors from "cors";
 import express from "express";
-import {signIn} from "./controller/user-controller";
 import initFirebase from "./firebase";
 import {authValidator} from "./validators/auth-validator";
 import {createCategoryValidator, createSubCategoryValidator} from "./validators/category-validator";
@@ -21,7 +20,6 @@ app.use(
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 
-app.post("/signIn", signIn);
 
 app.post("/category", [authValidator, validate(createCategoryValidator)], createCategory);
 app.post("/subCategory", [authValidator, validate(createSubCategoryValidator)], createSubCategory);
