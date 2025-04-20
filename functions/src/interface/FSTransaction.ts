@@ -45,4 +45,5 @@ export default interface FSTransaction {
   type: FSTransactionType;
   subType?: FSTransactionSubType
   mode: FSTransactionMode;
+  ngram?: string[]
 }

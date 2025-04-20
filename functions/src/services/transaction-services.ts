@@ -3,13 +3,14 @@ import FSTransaction, {FSSupportedCurrencies} from "../interface/FSTransaction";
 import CONSTANTS from "../utils/constants";
 import getCurrencyConverter from "./currency-converter-service";
 import ICreateTransactionCommand from "../commands/createTransactionCommand";
-import {createTransactionFromCommand} from "../utils/helpers";
+import {v4 as uuidv4} from "uuid";
 
 
-export async function addNewTransaction(command: ICreateTransactionCommand, userId: string) : Promise<FSTransaction> {
+export async function addNewTransaction(command: ICreateTransactionCommand, userId: string): Promise<FSTransaction> {
   let transaction: FSTransaction = createTransactionFromCommand(command);
   transaction = applyProcessingFee(transaction);
   transaction = await normalizeCurrency(transaction, command.useLiveFx ?? false)
+  transaction = createCommentNgram(transaction);
   await firestore().collection(CONSTANTS.COLLECTIONS.USERS)
     .doc(userId)
     .collection(CONSTANTS.COLLECTIONS.TRANSACTIONS)
@@ -74,4 +75,50 @@ async function normalizeCurrency(transaction: FSTransaction, live: boolean): Pro
   }
   transaction.amount = await getCurrencyConverter(live).convert(transaction.baseAmount, transaction.currency, transaction.date);
   return transaction;
+}
+
+function createCommentNgram(transaction: FSTransaction): FSTransaction {
+  const words = transaction.comment?.split(" ");
+  if (!words || !words.length) {
+    return transaction
+  }
+  const ngram: string[] = [];
+  words.forEach((word) => {
+    let rightIndex = word.length - 1;
+    while (rightIndex >= 0) {
+      let entry = "";
+      for (let i = 0; i <= rightIndex; i++) {
+        entry += word[i].toString();
+      }
+      ngram.push(entry);
+      rightIndex--;
+    }
+  });
+  if (ngram.length > 0) {
+    transaction.ngram = ngram;
+  }
+  return transaction;
+}
+
+function createTransactionFromCommand(command: ICreateTransactionCommand): FSTransaction {
+  const processingFeePercent = command.addProcessingFee ? 1.45 : 0;
+  const baseAmount = command.amount;
+  const transaction: FSTransaction = {
+    id: uuidv4(),
+    amount: command.amount,
+    baseAmount,
+    processingFeePercent: command.addProcessingFee ? processingFeePercent : 0,
+    categoryId: command.categoryId,
+    subCategoryId: command.subCategoryId ?? "",
+    currency: command.currency ?? FSSupportedCurrencies.USD,
+    comment: command.comment ?? "",
+    date: command.date,
+    updatedAt: new Date(),
+    type: command.type,
+    mode: command.mode,
+  };
+  if (command.subType) {
+    transaction.subType = command.subType;
+  }
+  return transaction
 }
