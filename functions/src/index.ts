@@ -25,7 +25,7 @@ app.post("/category", [authValidator, validate(createCategoryValidator)], create
 app.post("/subCategory", [authValidator, validate(createSubCategoryValidator)], createSubCategory);
 app.get("/category", authValidator, getCategories)
 
-app.post("/transaction", [authValidator, validate(createTransactionValidator)], createTransaction)
+app.put("/transaction", [authValidator, validate(createTransactionValidator)], createTransaction)
 app.get("/transactions", [authValidator, validate(getTransactionsValidator)], getAllTransactions)
 app.delete("/transaction/:id", [authValidator, validate(deleteTransactionValidator), deleteTransaction])
 exports.api = runWith({timeoutSeconds: 60, minInstances: 1}).https.onRequest(app);

@@ -1,22 +1,14 @@
-import {firestore} from "firebase-admin";
-import FSTransaction, {FSSupportedCurrencies} from "../interface/FSTransaction";
+import { firestore } from "firebase-admin";
+import FSTransaction, { FSSupportedCurrencies } from "../interface/FSTransaction";
 import CONSTANTS from "../utils/constants";
 import getCurrencyConverter from "./currency-converter-service";
 import ICreateTransactionCommand from "../commands/createTransactionCommand";
-import {v4 as uuidv4} from "uuid";
+import { v4 as uuidv4 } from "uuid";
 
 
 export async function addNewTransaction(command: ICreateTransactionCommand, userId: string): Promise<FSTransaction> {
-  let transaction: FSTransaction = createTransactionFromCommand(command);
-  transaction = applyProcessingFee(transaction);
-  transaction = await normalizeCurrency(transaction, command.useLiveFx ?? false)
-  transaction = createCommentNgram(transaction);
-  await firestore().collection(CONSTANTS.COLLECTIONS.USERS)
-    .doc(userId)
-    .collection(CONSTANTS.COLLECTIONS.TRANSACTIONS)
-    .doc(transaction.id)
-    .create(transaction)
-  return transaction;
+  let transaction: FSTransaction = await createTransactionFromCommand(command);
+  return await saveTransaction(userId, transaction);
 }
 
 export async function deleteTransactionById(userId: string, id: string) {
@@ -100,11 +92,11 @@ function createCommentNgram(transaction: FSTransaction): FSTransaction {
   return transaction;
 }
 
-function createTransactionFromCommand(command: ICreateTransactionCommand): FSTransaction {
+async function createTransactionFromCommand(command: ICreateTransactionCommand): Promise<FSTransaction> {
   const processingFeePercent = command.addProcessingFee ? 1.45 : 0;
   const baseAmount = command.amount;
-  const transaction: FSTransaction = {
-    id: uuidv4(),
+  let transaction: FSTransaction = {
+    id: command.id ?? uuidv4(),
     amount: command.amount,
     baseAmount,
     processingFeePercent: command.addProcessingFee ? processingFeePercent : 0,
@@ -120,5 +112,17 @@ function createTransactionFromCommand(command: ICreateTransactionCommand): FSTra
   if (command.subType) {
     transaction.subType = command.subType;
   }
+  transaction = applyProcessingFee(transaction);
+  transaction = await normalizeCurrency(transaction, command.useLiveFx ?? false)
+  transaction = createCommentNgram(transaction);
+  return transaction
+}
+
+async function saveTransaction(userId: string, transaction: FSTransaction) {
+  await firestore().collection(CONSTANTS.COLLECTIONS.USERS)
+    .doc(userId)
+    .collection(CONSTANTS.COLLECTIONS.TRANSACTIONS)
+    .doc(transaction.id)
+    .create(transaction)
   return transaction
 }
