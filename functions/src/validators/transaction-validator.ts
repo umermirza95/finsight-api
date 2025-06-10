@@ -1,8 +1,8 @@
-import { checkSchema, Meta } from "express-validator";
-import { FSTransactionMode, FSTransactionSubType, FSTransactionType, supportedCurrencies } from "../interface/FSTransaction";
+import {checkSchema, Meta} from "express-validator";
+import {FSTransactionMode, FSTransactionSubType, FSTransactionType, supportedCurrencies} from "../interface/FSTransaction";
 import ERROR_MESSAGES from "../utils/error-messages";
-import { categoryIdValidatorWithType, subcategoryIdValidator } from "./category-validator";
-import { getTransactionById } from "../services/transaction-services";
+import {categoryIdValidatorWithType, subcategoryIdValidator} from "./category-validator";
+import {getTransactionById} from "../services/transaction-services";
 
 
 export const deleteTransactionValidator = checkSchema({
@@ -60,8 +60,8 @@ export const createTransactionValidator = checkSchema({
     custom: {
       bail: true,
       options: transactionIdValidator,
-      errorMessage: "Transaction Id is invalid"
-    }
+      errorMessage: "Transaction Id is invalid",
+    },
   },
   type: {
     isIn: {

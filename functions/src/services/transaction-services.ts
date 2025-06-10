@@ -1,13 +1,13 @@
-import { firestore } from "firebase-admin";
-import FSTransaction, { FSSupportedCurrencies } from "../interface/FSTransaction";
+import {firestore} from "firebase-admin";
+import FSTransaction, {FSSupportedCurrencies} from "../interface/FSTransaction";
 import CONSTANTS from "../utils/constants";
 import getCurrencyConverter from "./currency-converter-service";
 import ICreateTransactionCommand from "../commands/createTransactionCommand";
-import { v4 as uuidv4 } from "uuid";
+import {v4 as uuidv4} from "uuid";
 
 
 export async function addNewTransaction(command: ICreateTransactionCommand, userId: string): Promise<FSTransaction> {
-  let transaction: FSTransaction = await createTransactionFromCommand(command);
+  const transaction: FSTransaction = await createTransactionFromCommand(command);
   return await saveTransaction(userId, transaction);
 }
 

@@ -33,5 +33,6 @@ module.exports = {
     "max-len": 0,
     "no-mixed-spaces-and-tabs": 0,
     "no-tabs": 0,
+    "@typescript-eslint/no-explicit-any": 0
   },
 };
