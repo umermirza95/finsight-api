@@ -123,6 +123,6 @@ async function saveTransaction(userId: string, transaction: FSTransaction) {
     .doc(userId)
     .collection(CONSTANTS.COLLECTIONS.TRANSACTIONS)
     .doc(transaction.id)
-    .create(transaction)
+    .set(transaction)
   return transaction
 }

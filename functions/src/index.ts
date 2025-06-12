@@ -6,7 +6,7 @@ import {createCategoryValidator, createSubCategoryValidator} from "./validators/
 import {createCategory, createSubCategory, getCategories} from "./controller/cateogry-controller";
 import validate from "./validators/validate";
 import {createTransactionValidator, deleteTransactionValidator, getTransactionsValidator} from "./validators/transaction-validator";
-import {createTransaction, deleteTransaction, getAllTransactions} from "./controller/transaction-controller";
+import {createTransaction, deleteTransaction, getAllTransactions, getTransaction} from "./controller/transaction-controller";
 import {runWith} from "firebase-functions/v1";
 
 initFirebase();
@@ -27,5 +27,6 @@ app.get("/category", authValidator, getCategories)
 
 app.put("/transaction", [authValidator, validate(createTransactionValidator)], createTransaction)
 app.get("/transactions", [authValidator, validate(getTransactionsValidator)], getAllTransactions)
+app.get("/transaction/:id", [authValidator, validate(deleteTransactionValidator), getTransaction])
 app.delete("/transaction/:id", [authValidator, validate(deleteTransactionValidator), deleteTransaction])
 exports.api = runWith({timeoutSeconds: 60, minInstances: 1}).https.onRequest(app);
