@@ -51,6 +51,10 @@ export const getTransactionsValidator = checkSchema({
       },
     },
   },
+  category: {
+    in: "query",
+    optional: true,
+  },
 })
 
 export const createTransactionValidator = checkSchema({
