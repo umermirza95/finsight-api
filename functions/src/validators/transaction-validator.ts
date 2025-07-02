@@ -51,7 +51,7 @@ export const getTransactionsValidator = checkSchema({
       },
     },
   },
-  category: {
+  categoryId: {
     in: "query",
     optional: true,
   },

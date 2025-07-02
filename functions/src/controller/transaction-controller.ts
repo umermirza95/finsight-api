@@ -46,7 +46,7 @@ export async function getAllTransactions(req: Request, res: Response) {
   try {
     const user: DecodedIdToken = req.body.user;
     const filters = matchedData(req);
-    const transactions = await getTransactionsInRange(user.uid, filters.from as Date, filters.to as Date, filters.category);
+    const transactions = await getTransactionsInRange(user.uid, filters.from as Date, filters.to as Date, filters.categoryId);
     res.status(200).send(successResponse(transactions, "transactions"))
   } catch (error) {
     logger.error(error);

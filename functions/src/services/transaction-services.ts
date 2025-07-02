@@ -35,7 +35,7 @@ export async function getTransactionById(userId: string, id: string): Promise<FS
   return transaction;
 }
 
-export async function getTransactionsInRange(userId: string, from: Date, to: Date, category?: string): Promise<FSTransaction[]> {
+export async function getTransactionsInRange(userId: string, from: Date, to: Date, categoryId?: string): Promise<FSTransaction[]> {
   let query = firestore()
     .collection(CONSTANTS.COLLECTIONS.USERS)
     .doc(userId)
@@ -43,8 +43,8 @@ export async function getTransactionsInRange(userId: string, from: Date, to: Dat
     .where("date", ">=", from)
     .where("date", "<", to)
     .orderBy("date", "desc");
-  if (category) {
-    query = query.where("category", "==", category);
+  if (categoryId) {
+    query = query.where("categoryId", "==", categoryId);
   }
   const snapshop = await query.get();
   return snapshop.empty ? [] : snapshop.docs.map((d) => {
